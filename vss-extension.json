@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
   "id": "print-epic-cards",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "name": "Print Epic Cards",
   "scopes": ["vso.work", "vso.extension.data_write"],
   "description": "Prints Epic Cards for physical road mapping.",

@@ -1,7 +1,7 @@
 import WITClient = require("TFS/WorkItemTracking/RestClient");
 import Models = require("TFS/WorkItemTracking/Contracts");
 import Q = require("q");
-const epicCardTemplate = require("./epic-card.handlebars");
+const epicCardTemplate = require("epic-card.handlebars");
 
 const extensionContext = VSS.getExtensionContext();
 const client = WITClient.getClient();
@@ -263,6 +263,6 @@ function prepare(workItems: Models.WorkItem[]) {
 VSS.register(
   `${extensionContext.publisherId}.${
     extensionContext.extensionId
-  }.print-epic-cards`,
+  }.printepiccards`,
   printEpicCards
 );
