@@ -1,4 +1,4 @@
-# print-epic-cardsv TEST
+# Print Epic Cards
 
 Prints Epic Cards in a format that I like them for use in physical road mapping
 
