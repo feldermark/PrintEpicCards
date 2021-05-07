@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
-  "id": "print-epic-cards",
-  "version": "1.0.3",
+  "id": "printepiccards",
+  "version": "1.0.0",
   "name": "Print Epic Cards",
   "scopes": ["vso.work", "vso.extension.data_write"],
   "description": "Prints Epic Cards for physical road mapping.",
@@ -16,11 +16,10 @@
     }
   ],
   "categories": ["Azure Boards"],
-  "tags": ["print", "epic", "cards"],
+  "tags": ["print", "epic", "physical cards"],
   "content": {
-    "license": {
-      "path": "LICENSE"
-    }
+    "details": {"path": "README.md"},
+    "license": {"path": "LICENSE"}
   },
   "branding": {
     "color": "rgb(27,160,225)",
@@ -57,7 +56,7 @@
   ],
   "contributions": [
     {
-      "id": "print-epic-cards",
+      "id": "printepiccards",
       "type": "ms.vss-web.action",
       "description": "Print Epic Cards.",
       "targets": ["ms.vss-work-web.work-item-context-menu"],
