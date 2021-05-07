@@ -3,7 +3,8 @@
 Prints Epic Cards in a format that I like them for use in physical road mapping
 
 
-## How To Contribute
+## How To Build
+https://docs.microsoft.com/en-us/azure/devops/extend/get-started/node?view=azure-devops
 
 1. Install Node
 2. `npm install -g webpack tfx-cli` to install global tools
