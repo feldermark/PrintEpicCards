@@ -26,9 +26,8 @@ interface IActionContext {
 
 const printEpicCards = {
   getMenuItems: (context: any) => {
-    
-    //poop - might need to add something here to only let it show on epics
-    //poop - would need to handle the case where they select epics and other types
+    // poop - might need to add something here to only let it show on epics
+    // poop - would need to handle the case where they select epics and other types
     let menuItemText = "Print Epic Card";
     if (context.workItemIds && context.workItemIds.length > 1) {
       menuItemText = "Print Epics Cards";
@@ -55,7 +54,7 @@ const printEpicCards = {
                 wiCardCount++;
                 if (page.type !== "processerror") {
                   epicCard = epicCardTemplate({
-                    //poop - this is where you need to map new fields to your handle bar template
+                    // poop - this is where you need to map new fields to your handle bar template
                     number: page.id,
                     style_wiNumber: page.id,
                     work_item_type: page.type,
@@ -220,21 +219,19 @@ function prepare(workItems: Models.WorkItem[]) {
             "title": item.fields["System.Title"],
             "description":  item.fields["System.Description"],
             "id":  item.fields["System.Id"],
-            
-            //poop - this is where you need to do some work to get the child features
-            //poop - make sure the html format description is being pulled over
-            
-            // "estimate" : item.fields["Microsoft.VSTS.Common.BusinessValue"],
-            // "assigned_to": item.fields["System.AssignedTo"],
-            // "area_path": area_val,
-            // "iteration_path": iteration_val,
+            // poop - this is where you need to do some work to get the child features
+            // poop - make sure the html format description is being pulled over
+            "estimate" : item.fields["Microsoft.VSTS.Common.BusinessValue"],
+            "assigned_to": item.fields["System.AssignedTo"],
+            "area_path": area_val,
+            "iteration_path": iteration_val,
             "tags": tag_val,
             "border_color": work_item_color,
             "icon": work_item_icon
           };
           template_filled = true;
         }
-        //poop - I think that you can safely comment this out
+        // poop - I think that you can safely comment this out
         if (!template_filled) {
           result = {
           "type": item.fields["System.WorkItemType"],
