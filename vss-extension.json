@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
   "id": "printepiccards",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "Print Epic Cards",
   "scopes": ["vso.work", "vso.extension.data_write"],
   "description": "Prints Epic Cards for physical road mapping.",
@@ -59,7 +59,12 @@
       "id": "printepiccards",
       "type": "ms.vss-web.action",
       "description": "Print Epic Cards.",
-      "targets": ["ms.vss-work-web.work-item-context-menu"],
+      "targets": [
+        "ms.vss-work-web.work-item-context-menu",
+        "ms.vss-work-web.query-result-work-item-menu",
+        "ms.vss-work-web.work-item-toolbar-menu",
+        "ms.vss-work-web.backlog-item-menu"
+    ],
       "properties": {
         "uri": "src/print-epic-cards.html"
       }

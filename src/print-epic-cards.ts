@@ -26,78 +26,100 @@ interface IActionContext {
 
 const printEpicCards = {
   getMenuItems: (context: any) => {
-    // poop - might need to add something here to only let it show on epics
-    // poop - would need to handle the case where they select epics and other types
-    let menuItemText = "Print Epic Card";
-    if (context.workItemIds && context.workItemIds.length > 1) {
-      menuItemText = "Print Epics Cards";
-    }
+    // Only shows if all selected cards are epics
+    const types = getTypesFromContext(context);
+    if (types.every((type) => ["Epic"].indexOf(type) >= 0)) {
+      
+      // Uses the plural of cards if more than one are selected
+      let menuItemText = "Print Epic Card";
+      if (context.workItemIds && context.workItemIds.length > 1) {
+        menuItemText = "Print Epic Cards";
+      }
 
-    return [
-      {
-        action: (actionContext: IActionContext) => {
-          const wids = actionContext.workItemIds ||
-            actionContext.ids || [actionContext.workItemId || actionContext.id];
+      return [
+        {
+          action: (actionContext: IActionContext) => {
+            const wids = actionContext.workItemIds || actionContext.ids || [actionContext.workItemId || actionContext.id];
 
-          return getWorkItems(wids)
-            .then(workItems => prepare(workItems))
-            .then(pages => {
-              return Q.all(pages);
-            })
-            .then((pages: any) => {
-              const workItems = document.createElement("div");
-              workItems.setAttribute("class", "container border");
-              let wiCardCount = 0;
-              pages.forEach(page => {
-                let epicCard: any;
+            return getWorkItems(wids)
+              .then(workItems => prepare(workItems))
+              .then(pages => {
+                return Q.all(pages);
+              })
+              .then((pages: any) => {
+                const workItems = document.createElement("div");
+                workItems.setAttribute("class", "container border");
+                let wiCardCount = 0;
+                pages.forEach(page => {
+                  let epicCard: any;
 
-                wiCardCount++;
-                if (page.type !== "processerror") {
-                  epicCard = epicCardTemplate({
-                    // poop - this is where you need to map new fields to your handle bar template
-                    number: page.id,
-                    style_wiNumber: page.id,
-                    work_item_type: page.type,
-                    title: page.title,
-                    estimate: page.estimate,
-                    assigned_to: page.assigned_to,
-                    area_path: page.area_path,
-                    iteration_path: page.iteration_path,
-                    tags: page.tags,
-                    border_color: page.border_color,
-                    icon: page.icon
-                  });
-                  workItems.innerHTML += epicCard;
-                }
-                else {
-                  workItems.innerHTML  += "<div> ERROR <br>" + page.message + "</div>";
-                }
+                  wiCardCount++;
+                  if (page.type !== "processerror") {
+                    epicCard = epicCardTemplate({
+                      // poop - this is where you need to map new fields to your handle bar template
+                      number: page.id,
+                      style_wiNumber: page.id,
+                      work_item_type: page.type,
+                      title: page.title,
+                      estimate: page.estimate,
+                      assigned_to: page.assigned_to,
+                      area_path: page.area_path,
+                      iteration_path: page.iteration_path,
+                      tags: page.tags,
+                      border_color: page.border_color,
+                      icon: page.icon
+                    });
+                    workItems.innerHTML += epicCard;
+                  }
+                  else {
+                    workItems.innerHTML  += "<div> ERROR <br>" + page.message + "</div>";
+                  }
+                  // this is setting a break at every 3 cards. need to change that
+                  if ((wiCardCount % 3) === 0 && pages.length > wiCardCount) {
+                    workItems.innerHTML += "<p style='page-break-before: always'><br/>&nbsp;<br/>";
+                  }
+                });
+                document.body.appendChild(workItems);
 
-                if ((wiCardCount % 3) === 0 && pages.length > wiCardCount) {
-                  workItems.innerHTML += "<p style='page-break-before: always'><br/>&nbsp;<br/>";
-                }
+                setTimeout(() => {
+                  window.focus(); // needed for IE
+                  let ieprint = document.execCommand("print", false, null);
+                  if (!ieprint) {
+                    (window as any).print();
+                  }
+                  workItems.parentElement.removeChild(workItems);
+                }, 1000);
               });
-              document.body.appendChild(workItems);
-
-              setTimeout(() => {
-                window.focus(); // needed for IE
-                let ieprint = document.execCommand("print", false, null);
-                if (!ieprint) {
-                  (window as any).print();
-                }
-                workItems.parentElement.removeChild(workItems);
-              }, 1000);
-            });
-        },
-        icon: "img/icon.png",
-        text: menuItemText,
-        title: menuItemText
-      } as IContributedMenuItem
-    ];
+          },
+          icon: "img/icon.png",
+          text: menuItemText,
+          title: menuItemText
+        } as IContributedMenuItem];
+    }
+    return [] as IContributedMenuItem[];
   }
 };
 
 // Promises
+function getTypesFromContext(context: any): string[] {
+  // Not all areas use the same format for passing work item type names.
+  // "workItemTypeName" for Query preview
+  // "workItemTypeNames" for backlogs
+  // "workItemType" for boards
+  let types = context.workItemTypeNames;
+  if (!types && context.workItemType) {
+      // Boards only support a single work item
+      types = [context.workItemType];
+  }
+
+  if (!types && context.workItemTypeName) {
+      // Query wi preview
+      types = [context.workItemTypeName];
+  }
+
+  return types;
+}
+
 function getWorkItems(wids: number[]): IPromise<Models.WorkItem[]> {
   return client.getWorkItems(
     wids,
