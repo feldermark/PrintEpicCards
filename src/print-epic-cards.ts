@@ -29,7 +29,7 @@ const printEpicCards = {
     // Only shows if all selected cards are epics
     const types = getTypesFromContext(context);
     if (types.every((type) => ["Epic"].indexOf(type) >= 0)) {
-      
+
       // Uses the plural of cards if more than one are selected
       let menuItemText = "Print Epic Card";
       if (context.workItemIds && context.workItemIds.length > 1) {
@@ -125,7 +125,7 @@ function getWorkItems(wids: number[]): IPromise<Models.WorkItem[]> {
     wids,
     undefined,
     undefined,
-    Models.WorkItemExpand.Fields
+    Models.WorkItemExpand.All // this should get all the links
   );
 }
 
@@ -155,86 +155,7 @@ function prepare(workItems: Models.WorkItem[]) {
         let tag_val = item.fields["System.Tags"];
         let area_val = getLastPathValue(item.fields["System.AreaPath"]);
         let iteration_val = getLastPathValue(item.fields["System.IterationPath"]);
-        // if (item.fields["System.WorkItemType"] === "User Story") {
-        //   result = {
-        //     "type": item.fields["System.WorkItemType"],
-        //     "title": item.fields["System.Title"],
-        //     "id":  item.fields["System.Id"],
-        //     "estimate" : item.fields["Microsoft.VSTS.Scheduling.StoryPoints"],
-        //     "assigned_to": item.fields["System.AssignedTo"],
-        //     "area_path": area_val,
-        //     "iteration_path": iteration_val,
-        //     "tags": tag_val,
-        //     "border_color": work_item_color,
-        //     "icon": work_item_icon
-        //   };
-        //   template_filled = true;
-        // }
 
-        // if (item.fields["System.WorkItemType"] === "Product Backlog Item") {
-        //   result = {
-        //     "type": item.fields["System.WorkItemType"],
-        //     "title": item.fields["System.Title"],
-        //     "id":  item.fields["System.Id"],
-        //     "estimate" : item.fields["Microsoft.VSTS.Common.BusinessValue"],
-        //     "assigned_to": item.fields["System.AssignedTo"],
-        //     "area_path": area_val,
-        //     "iteration_path": iteration_val,
-        //     "tags": tag_val,
-        //     "border_color": work_item_color,
-        //     "icon": work_item_icon
-        //   };
-        //   template_filled = true;
-        // }
-
-        // if (item.fields["System.WorkItemType"] === "Requirement") {
-        //   result = {
-        //     "type": item.fields["System.WorkItemType"],
-        //     "title": item.fields["System.Title"],
-        //     "id":  item.fields["System.Id"],
-        //     "estimate" : item.fields["Microsoft.VSTS.Scheduling.OriginalEstimate"],
-        //     "assigned_to": item.fields["System.AssignedTo"],
-        //     "area_path": area_val,
-        //     "iteration_path": iteration_val,
-        //     "tags": tag_val,
-        //     "border_color": work_item_color,
-        //     "icon": work_item_icon
-        //   };
-        //   template_filled = true;
-        // }
-
-        // if (item.fields["System.WorkItemType"] === "Bug") {
-        //   result = {
-        //     "type": item.fields["System.WorkItemType"],
-        //     "title": item.fields["System.Title"],
-        //     "id":  item.fields["System.Id"],
-        //     "estimate" : item.fields["Microsoft.VSTS.Scheduling.OriginalEstimate"],
-        //     "assigned_to": item.fields["System.AssignedTo"],
-        //     "area_path": area_val,
-        //     "iteration_path": iteration_val,
-        //     "tags": tag_val,
-        //     "border_color": work_item_color,
-        //     "icon": work_item_icon
-        //   };
-        //   template_filled = true;
-        // }
-
-        // if (item.fields["System.WorkItemType"] === "Task") {
-        //   result = {
-        //     "type": item.fields["System.WorkItemType"],
-        //     "title": item.fields["System.Title"],
-        //     "description":  item.fields["System.Description"],
-        //     "id":  item.fields["System.Id"],
-        //     "estimate" : item.fields["Microsoft.VSTS.Scheduling.OriginalEstimate"],
-        //     "assigned_to": item.fields["System.AssignedTo"],
-        //     "area_path": area_val,
-        //     "iteration_path": iteration_val,
-        //     "tags": tag_val,
-        //     "border_color": work_item_color,
-        //     "icon": work_item_icon
-        //   };
-        //   template_filled = true;
-        // }
         if (item.fields["System.WorkItemType"] === "Epic") {
           result = {
             "type": item.fields["System.WorkItemType"],
@@ -251,23 +172,8 @@ function prepare(workItems: Models.WorkItem[]) {
             "border_color": work_item_color,
             "icon": work_item_icon
           };
+          console.log(item.relations);
           template_filled = true;
-        }
-        // poop - I think that you can safely comment this out
-        if (!template_filled) {
-          result = {
-          "type": item.fields["System.WorkItemType"],
-          "title": item.fields["System.Title"],
-          "description":  item.fields["System.Description"],
-          "id":  item.fields["System.Id"],
-          "estimate" : item.fields["Microsoft.VSTS.Scheduling.OriginalEstimate"],
-          "assigned_to": item.fields["System.AssignedTo"],
-          "area_path": area_val,
-          "iteration_path": iteration_val,
-          "tags": tag_val,
-          "border_color": work_item_color,
-          "icon": work_item_icon
-        };
         }
       }
     catch (e) {
