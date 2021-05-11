@@ -56,15 +56,11 @@ const printEpicCards = {
                   wiCardCount++;
                   if (page.type !== "processerror") {
                     epicCard = epicCardTemplate({
-                      // poop - this is where you need to map new fields to your handle bar template
                       number: page.id,
                       style_wiNumber: page.id,
                       work_item_type: page.type,
                       title: page.title,
-                      estimate: page.estimate,
-                      assigned_to: page.assigned_to,
-                      area_path: page.area_path,
-                      iteration_path: page.iteration_path,
+                      description: page.description,
                       tags: page.tags,
                       border_color: page.border_color,
                       icon: page.icon
@@ -74,10 +70,8 @@ const printEpicCards = {
                   else {
                     workItems.innerHTML  += "<div> ERROR <br>" + page.message + "</div>";
                   }
-                  // this is setting a break at every 3 cards. need to change that
-                  if ((wiCardCount % 3) === 0 && pages.length > wiCardCount) {
-                    workItems.innerHTML += "<p style='page-break-before: always'><br/>&nbsp;<br/>";
-                  }
+                  // adds a page break at the end of each epic
+                  workItems.innerHTML += "<p style='page-break-before: always'><br/>&nbsp;<br/>";
                 });
                 document.body.appendChild(workItems);
 
@@ -162,8 +156,6 @@ function prepare(workItems: Models.WorkItem[]) {
             "title": item.fields["System.Title"],
             "description":  item.fields["System.Description"],
             "id":  item.fields["System.Id"],
-            // poop - this is where you need to do some work to get the child features
-            // poop - make sure the html format description is being pulled over
             "estimate" : item.fields["Microsoft.VSTS.Common.BusinessValue"],
             "assigned_to": item.fields["System.AssignedTo"],
             "area_path": area_val,
@@ -172,7 +164,11 @@ function prepare(workItems: Models.WorkItem[]) {
             "border_color": work_item_color,
             "icon": work_item_icon
           };
+          
+          // this gets the relations now you need to figure out what to do with 
           console.log(item.relations);
+
+
           template_filled = true;
         }
       }
