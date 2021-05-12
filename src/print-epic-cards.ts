@@ -1,6 +1,8 @@
 import WITClient = require("TFS/WorkItemTracking/RestClient");
 import Models = require("TFS/WorkItemTracking/Contracts");
 import Q = require("q");
+import { StatusIndicator } from "VSS/Controls/StatusIndicator";
+import { validateGroup } from "VSS/Controls/Validation";
 const epicCardTemplate = require("epic-card.handlebars");
 
 const extensionContext = VSS.getExtensionContext();
@@ -63,7 +65,8 @@ const printEpicCards = {
                       description: page.description,
                       tags: page.tags,
                       border_color: page.border_color,
-                      icon: page.icon
+                      icon: page.icon,
+                      children: page.children
                     });
                     workItems.innerHTML += epicCard;
                   }
@@ -94,7 +97,6 @@ const printEpicCards = {
   }
 };
 
-// Promises
 function getTypesFromContext(context: any): string[] {
   // Not all areas use the same format for passing work item type names.
   // "workItemTypeName" for Query preview
@@ -105,22 +107,53 @@ function getTypesFromContext(context: any): string[] {
       // Boards only support a single work item
       types = [context.workItemType];
   }
-
   if (!types && context.workItemTypeName) {
       // Query wi preview
       types = [context.workItemTypeName];
   }
-
   return types;
 }
 
+// Promises
 function getWorkItems(wids: number[]): IPromise<Models.WorkItem[]> {
   return client.getWorkItems(
     wids,
     undefined,
     undefined,
-    Models.WorkItemExpand.All // this should get all the links
+    Models.WorkItemExpand.All
   );
+}
+
+function getWorkItem(wid: number): IPromise<Models.WorkItem> {
+  return client.getWorkItem(
+    wid,
+    undefined,
+    undefined,
+    Models.WorkItemExpand.Fields
+  );
+}
+
+function nz(str: string, strReplace: string): string {
+  if (str === undefined) {
+    return strReplace;
+  }
+  return str;
+}
+
+ async function buildChildTableHTML(wir: Models.WorkItemRelation[]): Promise<string> {
+  let htmlrow: string = "<tr><th>Feature</th><th>Assigned To</th><th>State</th></tr>";
+  if (wir) {
+    let wids: number[] = wir.map(wid => getLastURLValue(wid.url));
+    let children = await getWorkItems(wids);
+    children.forEach(child => {
+      htmlrow += "<tr>";
+      htmlrow += "<td>" + child.fields["System.Title"] + "</td>";
+      htmlrow += "<td>" + nz(child.fields["System.AssignedTo"], "-") + "</td>";
+      htmlrow += "<td>" + child.fields["System.State"] + "</td>";
+      htmlrow +=  "</tr>";
+    });
+  }
+  return htmlrow;
 }
 
 function getWorkItemDefinition(thisWorkItem: Models.WorkItem): IPromise<Models.WorkItemType> {
@@ -137,18 +170,29 @@ function getLastPathValue(pathText: string): string {
   }
 }
 
+function getLastURLValue(urlText: string): number {
+  if (urlText.length > 0) {
+    let urlArray: string[] = urlText.split("/");
+    return parseInt(urlArray[urlArray.length - 1]);
+  }
+  else {
+    return 0;
+  }
+}
+
 function prepare(workItems: Models.WorkItem[]) {
   return workItems.map(item => {
     let result = {};
 
-    return getWorkItemDefinition(item).then(thisWIT => {
+    return getWorkItemDefinition(item).then(async thisWIT => {
       try {
         let template_filled: boolean = false;
         let work_item_color = thisWIT["color"];
         let work_item_icon = thisWIT.icon["url"];
-        let tag_val = item.fields["System.Tags"];
+        let tag_val = nz(item.fields["System.Tags"], "");
         let area_val = getLastPathValue(item.fields["System.AreaPath"]);
         let iteration_val = getLastPathValue(item.fields["System.IterationPath"]);
+        let child_table_html = await buildChildTableHTML(item.relations).then(value => { return value; });
 
         if (item.fields["System.WorkItemType"] === "Epic") {
           result = {
@@ -162,13 +206,9 @@ function prepare(workItems: Models.WorkItem[]) {
             "iteration_path": iteration_val,
             "tags": tag_val,
             "border_color": work_item_color,
-            "icon": work_item_icon
+            "icon": work_item_icon,
+            "children": "<table>"  + child_table_html + "</table>"
           };
-          
-          // this gets the relations now you need to figure out what to do with 
-          console.log(item.relations);
-
-
           template_filled = true;
         }
       }
@@ -179,7 +219,7 @@ function prepare(workItems: Models.WorkItem[]) {
       };
     }
     return result;
-  });
+    });
   });
 
 }
