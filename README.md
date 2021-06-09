@@ -15,4 +15,3 @@ https://docs.microsoft.com/en-us/azure/devops/extend/get-started/node?view=azure
 ## Credits
 - Based on [pCards](https://github.com/jeffpriz/pcards)
 - Based on [WIPrint](https://github.com/MrTarantula/WIPrint)
-- Dave Van Vliet - Card Layout
