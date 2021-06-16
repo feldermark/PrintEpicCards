@@ -36,10 +36,10 @@
   },
   "name": "print-epic-cards",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.2",
   "description": "Prints Epic Cards for physical road mapping",
   "main": "webpack.config.js",
   "keywords": [],
-  "author": "",
+  "author": "feldermark",
   "license": "ISC"
 }
