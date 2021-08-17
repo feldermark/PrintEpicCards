@@ -32,6 +32,7 @@
     "handlebars": "^4.7.7",
     "handlebars-loader": "^1.7.1",
     "office-ui-fabric-js": "^1.4.0",
+    "path-parse": "^1.0.7",
     "vss-web-extension-sdk": "^5.141.0"
   },
   "name": "print-epic-cards",
